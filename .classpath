@@ -33,5 +33,39 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-converter-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-converter-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-layout-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-layout-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-model-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-bpmn-model-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-camel-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-camel-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-cdi-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-cdi.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-common-rest-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-common-rest-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-cxf-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-cxf-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-diagram-rest-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-diagram-rest-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-engine-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-engine-5.13.jar" sourcepath="lib"/>
+	<classpathentry kind="lib" path="lib/activiti-explorer-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-explorer-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-json-converter-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-json-converter-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-modeler-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-modeler-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-mule-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-mule-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-osgi-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-osgi-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-rest-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-rest-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-simple-workflow-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-simple-workflow-5.13.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-spring-5.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/activiti-spring-5.13.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
