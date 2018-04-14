@@ -6,7 +6,7 @@
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-    <!-- 配置流程引擎创建参数 -->
+    <!-- setting business engine create param -->
     <bean id = "processEngineConfiguration" class = "org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     	<property name="jdbcUrl" value = "jdbc:mysql://localhost:3306/permit" />    
     	<property name="jdbcDriver" value = "com.mysql.jdbc.Driver" />    
