@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:aop="http://www.springframework.org/schema/aop"
+ xmlns:tx="http://www.springframework.org/schema/tx"
+ xmlns:context="http://www.springframework.org/schema/context"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- 该配置文件进行基本的Spring和Hibernate的集成配置。
+          与业务相关的配置将放在其它的Spring配置文件中。 
+    -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<!--bean id="propertyConfigurer" class="com.agree.util.ConfParser"-->
+		<property name="locations">
+			<list>
+				<value>WEB-INF/classes/conf.properties</value>
+			</list>
+			</property>
+	</bean>
+	<!-- 该 BeanPostProcessor 将自动起作用，对标注 @Autowired 的 Bean 进行自动注入 --> 
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	<!-- 自动搜索路径 -->
+	<context:component-scan base-package="com.agree" /> 
+	 
+  <bean id="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}"></property>
+  		<property name="password" value="${jdbc.password}"></property>
+  		<property name="minPoolSize"><value>3</value></property>
+  		<property name="maxPoolSize"><value>20</value></property>	<!--连接池中保留的最大连接数。Default: 15 --> 
+  		<property name="maxIdleTime"><value>60</value></property><!--最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 --> 
+  		<property name="acquireIncrement"><value>30</value></property>
+  		<property name="maxStatements"><value>0</value></property>
+ 		<property name="initialPoolSize"><value>3</value></property><!--初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 3 --> 
+  		<property name="idleConnectionTestPeriod"><value>60</value></property><!--每60秒检查所有连接池中的空闲连接。Default: 0 -->
+  		<property name="testConnectionOnCheckin"><value>false</value></property> 
+  		<property name="acquireRetryAttempts"><value>3</value></property><!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 --> 
+		<property name="checkoutTimeout"><value>0</value></property> <!--当连接池用完时客户端调用getConnection()后等待获取新连接的时间，超时后将抛出 SQLException,如设为0则无限期等待。单位毫秒。Default: 0 --> 
+  		<property name="breakAfterAcquireFailure"><value>true</value></property>
+ 		 <property name="testConnectionOnCheckout"><value>false</value></property>
+	</bean>
+	 <!-- HIERNANATE配置 -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+       <property name="dataSource" ref="datasource"/>
+       <property name="mappingDirectoryLocations">
+   			<list>
+   				 <value>WEB-INF/classes/resources/hibernate</value>
+  			</list>
+ 	   </property>
+        <property name="hibernateProperties">
+    	<props>
+     		<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+      		<prop key="hibernate.show_sql">true</prop>
+       		<prop key="hibernate.generate_statistics">true</prop>
+     		<prop key="hibernate.connection.release_mode">auto</prop>                      
+       		<prop key="hibernate.autoReconnect">true</prop>
+       		<prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+       		<!--prop key="hibernate.current_session_context_class">thread</prop>  -->
+       		<prop key="hibernate.query.factory_class">org.hibernate.hql.ast.ASTQueryTranslatorFactory</prop>
+       		<!--使用二级缓存  -->
+       		<prop key="hibernate.cache.use_query_cache">false</prop>
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+   		</props>
+  	 </property> 
+    </bean>
+	
+    <bean id="habernateDao" class="com.agree.framework.dao.core.HibernateGenericDao">
+		<property name="sessionFactory">
+			<ref local="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- AOP记录Action方法后日志 -->
+   <bean id="aspect" class="com.agree.framework.aop.AspectAdvice">
+		<property name="logService">
+			<ref bean="LogService"/>
+		</property>
+	</bean>
+	<aop:config proxy-target-class="true">  
+		<aop:pointcut id="adminAction" expression="execution(* com.agree.framework.web.action.administration.*.*(..))"/>
+		<aop:pointcut id="bsmsAction1" expression="execution(* com.agree.bsms.action.*.*.*(..))"/>
+		<aop:pointcut id="bsmsAction2" expression="execution(* com.agree.bsms.action.*.*.*.*(..))"/> 
+		<!-- 数据字典 -->
+		<aop:pointcut id="dictmanageAction" expression="execution(* com.agree.solutionframe.dictmanage.action.*.*(..))"/>	
+		<!-- 永隆银行 -->
+		<aop:pointcut id="wlbAction1" expression="execution(* com.agree.wlb.action.*.*(..))"/>
+		<aop:pointcut id="wlbAction2" expression="execution(* com.agree.wlb.action.*.*.*(..))"/>			   
+		<aop:aspect ref="aspect">
+			<aop:after pointcut-ref="adminAction" method="afterMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:after pointcut-ref="bsmsAction1" method="afterMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:after pointcut-ref="bsmsAction2" method="afterMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="adminAction" method="beforeMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="bsmsAction1" method="beforeMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="bsmsAction2" method="beforeMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="dictmanageAction" method="beforeMethod"/> 
+		</aop:aspect>	
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="wlbAction1" method="beforeMethod"/> 
+		</aop:aspect>
+		<aop:aspect ref="aspect">
+			<aop:before pointcut-ref="wlbAction1" method="beforeMethod"/> 
+		</aop:aspect>								
+	</aop:config>
+   
+<!-- 配置数据库的事务管理器-->
+   
+    <bean id="transactionManager"
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+        abstract="false" lazy-init="default" autowire="default">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory" />
+        </property>
+    </bean>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    	<tx:attributes>
+        <tx:method name="*" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="bamsServiceMethod"
+            expression="execution(* com.agree.bsms.service.*.*(..))" />
+        <aop:pointcut id="bsmsPackServiceMethod"
+            expression="execution(* com.agree.bsms.service.*.*.*(..))" />
+         <aop:pointcut id="freamServiceMethod"
+            expression="execution(* com.agree.framework.web.service.administration.*.*(..))" />
+         <aop:pointcut id="jasperServiceMethod"
+            expression="execution(* com.agree.framework.jasper.ReportService.*(..))" />
+		<!-- dictmanage service 切面配置 -->
+        <aop:pointcut id="dictmanageServiceMethod"
+            expression="execution(* com.agree.solutionframe.dictmanage.service.*.*(..))" />  
+		<!-- wlb service切面配置 -->
+        <aop:pointcut id="wlbServiceMethod"
+            expression="execution(* com.agree.wlb.service.*.*.*(..))" />                           
+         <aop:pointcut id="startMethod"
+            expression="execution(* com.agree.framework.struts2.webserver.StartupObject.*(..))" />   
+        <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="bamsServiceMethod" />
+        <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="bsmsPackServiceMethod" />
+         <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="freamServiceMethod" /> 
+         <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="jasperServiceMethod" /> 
+         <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="startMethod" />
+ 		 <!-- dictmanage service切面配置 -->
+         <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="dictmanageServiceMethod" />  
+		 <!-- wlb service切面配置 -->
+         <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="wlbServiceMethod" />                          
+    </aop:config>
+       
+    
+     <!-- 通讯平台包处理工具类 -->
+    <bean id="AFAMessagePacker" class="com.agree.bsms.communication.packer.AFAMessagePacker">
+	</bean>
+    <!-- socket通讯客户端 -->
+     <bean id="SocketClient" class="com.agree.framework.communication.socket.SocketClient">
+		<property name="host1">
+			<value>127.0.0.1</value>
+		</property>
+		<property name="port1">
+			<value>9200</value>
+		</property>
+		<!--property name="host2">
+			<value>localhost</value>
+		</property>
+		<property name="port2">
+			<value>7005</value>
+		</property>  -->
+		<property name="soTimeout">
+		<!-- 50秒，单位毫秒 -->
+			<value>50000</value>
+		</property>
+		<property name="packer">
+			<ref bean="AFAMessagePacker" />
+		</property>
+		<property name="msgService">
+			<ref bean="MsgService"/>
+		</property>
+	</bean>
+    
+    <!-- AFAAFP  socket通讯客户端 -->
+     <bean id="AfaafpSocketClient" class="com.agree.framework.communication.socket.AfaafpSocketClient">
+		<property name="host1">
+			<value>127.0.0.1</value>
+		</property>
+		<property name="port1">
+			<value>9201</value>
+		</property>
+		<!-- property name="host2">
+			<value>localhost</value>
+		</property>
+		<property name="port2">
+			<value>7005</value>
+		</property> -->
+		<property name="soTimeout">
+		<!-- 30秒，单位毫秒 -->
+			<value>1000</value>
+		</property>
+	</bean>	
+	
+	<!-- socket通讯服务端 -->
+     <bean id="SocketServer" class="com.agree.framework.communication.socket.SocketServer">
+		<property name="port">
+			<value>7654</value>
+		</property>
+		<property name="soTimeout">
+		<!-- 30秒，单位毫秒 -->
+			<value>1000</value>
+		</property>
+		<property name="packer">
+			<ref bean="AFAMessagePacker" />
+		</property>
+	</bean>
+ <!-- Startup Object Bean -->
+	<bean id="SysStartupService" class="com.agree.framework.struts2.webserver.StartupObject">
+		<property name="sqlDao_h">
+			<ref bean="habernateDao"/>
+		</property>
+		<property name="socket">
+			<ref bean="SocketServer"/>
+		</property>
+	</bean>
+	
+</beans>

@@ -42,6 +42,8 @@ public class Test {
 		System.out.println("singleResult.getKey(): "+name);
 		processInstance = processEngine.getRuntimeService().startProcessInstanceByKey(name);
 		System.out.println("------processInstance id: "+processInstance.getId()+",activiti id: "+processInstance.getActivityId());
+		
+		
 		// 删除流程deplomentId
 		// repositoryService.deleteDeployment(deplomentId);
 
